@@ -1,0 +1,83 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_guide_guidelist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:overScrollMode="never" />
+    
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="100dip"
+        android:orientation="horizontal"
+       	android:layout_alignParentBottom="true"
+        android:background="#00000000">
+        
+        <ImageView 
+            android:id="@+id/iv_guide_dot_midder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/dot_nonselected"
+            android:layout_centerHorizontal="true"
+            />
+        <ImageView 
+            android:id="@+id/iv_guide_dot_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/dot_nonselected"
+            android:layout_centerHorizontal="true"
+            android:layout_marginRight="15dip"
+            android:layout_toLeftOf="@id/iv_guide_dot_midder"
+            />
+        <ImageView 
+            android:id="@+id/iv_guide_dot_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/dot_nonselected"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="15dip"
+            android:layout_toRightOf="@id/iv_guide_dot_midder"/>
+        
+        
+        
+    	<Button 
+    	    android:id="@+id/btn_guide_register"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_centerVertical="true"
+    	    android:layout_marginLeft="10dip"
+    	    android:background="@drawable/register_btn"/>
+    	
+    	<Button 
+    	    android:id="@+id/btn_guide_login"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_centerVertical="true"
+    	    android:layout_alignParentRight="true"
+    	    android:layout_marginRight="10dip"
+    	    android:background="@drawable/login_btn"
+        
+    	    />
+    </RelativeLayout>
+    
+
+</RelativeLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

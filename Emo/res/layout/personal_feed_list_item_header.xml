@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="200dip"
+    android:background="@color/gray"
+    android:orientation="vertical" >
+
+    <!-- 头像，点赞数 -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="120dip">
+
+        <RelativeLayout
+            android:id="@+id/rl_personal_header_heart_red"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" >
+
+            <!-- 头像 -->
+            <ImageView
+                android:id="@+id/iv_list_item_header"
+                android:layout_width="60dip"
+                android:layout_height="60dip"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"/>
+
+            <!-- 红心 -->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/heart_red"/>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_list_item_header_like_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/rl_personal_header_heart_red"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@id/rl_personal_header_heart_red"
+            android:textColor="@color/white" />
+    </RelativeLayout>
+
+    <!-- 关注数，粉丝数 -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:orientation="horizontal" >
+
+        <View 
+            android:id="@+id/view_referto_center"
+            android:layout_width="1dip"
+            android:layout_height="1dip"
+            android:layout_centerInParent="true"/>
+        <TextView
+            android:id="@+id/tv_list_item_header_followings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+			android:layout_toLeftOf="@id/view_referto_center"
+			android:layout_centerVertical="true"
+			android:layout_marginRight="20dip"/>
+
+        <TextView
+            android:id="@+id/tv_list_item_header_followers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+        	android:layout_toRightOf="@id/view_referto_center" 
+        	android:layout_centerVertical="true"
+        	android:layout_marginLeft="20dip"/>
+    </RelativeLayout>
+
+    <!-- 已关注 -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dip">
+        <ImageView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/test"/>
+    </RelativeLayout>
+
+</LinearLayout>

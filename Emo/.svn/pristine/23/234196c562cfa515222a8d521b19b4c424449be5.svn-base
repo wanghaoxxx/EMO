@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#ffffff</color>
+    <color name="transparent">#00000000</color>
+    <color name="translucent">#e0000000</color>
+    <color name="blue">#39C4E6</color>
+    <color name="gray">#7C7D7E</color>
+    <color name="publish_time">#c9c9c9</color>
+    <color name="dark">#313131</color>
+    <color name="light_dark">#535353</color>
+    <color name="black">#000000</color>
+</resources>

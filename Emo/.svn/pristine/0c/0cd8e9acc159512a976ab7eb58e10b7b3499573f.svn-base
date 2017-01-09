@@ -1,0 +1,467 @@
+package com.emolabs.im.adapter;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.emolabs.im.R;
+import com.emolabs.im.activity.LikeListActivity;
+import com.emolabs.im.activity.PersonalFeedActivity;
+import com.emolabs.im.activity.SingleFeedActivity;
+import com.emolabs.im.config.AppConfig;
+import com.emolabs.im.config.EmoApplication;
+import com.emolabs.im.net.EmoHttpClient;
+import com.emolabs.im.net.EmoRequest;
+import com.emolabs.im.net.EmoStringRequest;
+import com.emolabs.im.net.IEmoHttpListener;
+import com.emolabs.im.struct.FeedDataItem;
+import com.emolabs.im.struct.Like;
+import com.emolabs.im.utils.DensityUtil;
+import com.emolabs.im.utils.EmoTimeUtils;
+import com.google.gson.Gson;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+public class ListFeedAdapter extends BaseAdapter{
+	public static final String TAG = "ListFeedAdapter";
+	public static final int VIEW_HOLDER_KEY = 100;
+	public Context context;
+	public ArrayList<FeedDataItem> feedItemList;
+	public String last_fid;
+	
+	private int repostImageWidth; // 回图view的宽度
+	private int originImageWidth; // 原始图view的宽度
+	private static final int PORTRAIT = 0;// 竖屏
+	private static final int LANDSCAPE = 1;// 横屏
+
+	
+	//双击事件
+	long preMillis = 0;
+	
+	public ListFeedAdapter(Context context, ArrayList<FeedDataItem> list,String last_fid) {
+		this.context = context;
+		this.feedItemList = list;
+		this.last_fid = last_fid;
+		WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+		Display display = manager.getDefaultDisplay();
+		repostImageWidth = display.getWidth();
+	}
+
+	@Override
+	public int getCount() {
+		return feedItemList.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		return null;
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public int getItemViewType(int position) {
+		FeedDataItem item = feedItemList.get(position);
+		if (item.image.direction == 0) {
+			return PORTRAIT;
+		} else if (item.image.direction == 1) {
+			return LANDSCAPE;
+		}
+		return LANDSCAPE;
+	}
+
+	// 有几种布局文件
+	@Override
+	public int getViewTypeCount() {
+		return 2;
+	}
+
+	private class ViewHolder {
+		RelativeLayout llListItemTitle;
+		//ImageView ivListItemBackground;
+		ImageView ivHeader;
+		TextView tvName;
+		TextView tvPublishTime;
+		ImageView ivPhoto;
+		ImageView ivReplyPhoto;
+		TextView tvContent;
+		TextView tvLabel;
+		TextView tvPosition;
+		ImageView ivLike;
+		TextView tvLikeCount;
+		ImageView ivTakePhoto;
+		TextView tvReplyCount;
+		ImageView ivMore;
+	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		final int item_type = getItemViewType(position);
+		final FeedDataItem feedItem = feedItemList.get(position);
+		ViewHolder holder=null;
+		if (convertView == null) {
+			convertView = LayoutInflater.from(context).inflate(R.layout.feed_list_item, parent, false);
+			holder = new ViewHolder();
+			holder.llListItemTitle = (RelativeLayout) convertView.findViewById(R.id.rl_title);
+			//holder.ivListItemBackground = (ImageView) convertView.findViewById(R.id.iv_feed_list_item_background);
+			holder.ivHeader = (ImageView) convertView.findViewById(R.id.iv_list_item_head);
+			holder.tvName = (TextView) convertView.findViewById(R.id.tv_list_item_name);
+			holder.tvPublishTime = (TextView) convertView.findViewById(R.id.tv_list_item_publish_time);
+			holder.ivReplyPhoto = (ImageView) convertView.findViewById(R.id.iv_list_item_reply_photo);
+			holder.tvContent = (TextView) convertView.findViewById(R.id.tv_list_item_content);
+			holder.tvPosition = (TextView) convertView.findViewById(R.id.tv_list_item_position);
+			holder.ivLike = (ImageView) convertView.findViewById(R.id.iv_list_item_like);
+			holder.tvLikeCount = (TextView) convertView.findViewById(R.id.tv_list_item_likecount);
+			holder.ivTakePhoto = (ImageView) convertView.findViewById(R.id.iv_list_item_take_photo);
+			holder.tvReplyCount = (TextView) convertView.findViewById(R.id.tv_list_item_reply_photo_count);
+			holder.ivMore = (ImageView) convertView.findViewById(R.id.iv_list_item_more);
+			holder.ivPhoto = (ImageView) convertView.findViewById(R.id.iv_list_item_photo);
+			RelativeLayout.LayoutParams paramsRepost = (RelativeLayout.LayoutParams) holder.ivPhoto.getLayoutParams();
+			RelativeLayout.LayoutParams paramsOrigin = (RelativeLayout.LayoutParams) holder.ivReplyPhoto
+					.getLayoutParams();
+			switch (item_type) {
+
+			// 判断回复图片
+			case PORTRAIT:
+				paramsRepost.height = (int) (((float) 4 / 3) * repostImageWidth);
+				break;
+			case LANDSCAPE:
+				paramsRepost.height = (int) (((float) 3 / 4) * repostImageWidth);
+				break;
+			}
+			// 判断原始图片
+			if (feedItem.is_repost) {
+				if (feedItem.repost.repost_image.direction == 0) {// 竖屏
+					paramsOrigin.width = DensityUtil.dip2px(context, 120);
+					paramsOrigin.height = DensityUtil.dip2px(context, 160);
+				} else if (feedItem.repost.repost_image.direction == 1) {// 横屏
+					paramsOrigin.width = DensityUtil.dip2px(context, 160);
+					paramsOrigin.height = DensityUtil.dip2px(context, 120);
+				}
+			}
+			convertView.setTag(holder);
+		} else {
+			holder = (ViewHolder) convertView.getTag();
+		}
+		
+		// 每个控件都设置索引
+		holder.llListItemTitle.setTag(String.valueOf(position));
+		//holder.ivListItemBackground.setTag(String.valueOf(position));
+		holder.tvName.setTag(String.valueOf(position));
+		holder.tvPublishTime.setTag(String.valueOf(position));
+		holder.ivReplyPhoto.setTag(String.valueOf(position));
+		holder.tvContent.setTag(String.valueOf(position));
+		holder.tvPosition.setTag(String.valueOf(position));
+		holder.ivLike.setTag(String.valueOf(position));
+		holder.tvLikeCount.setTag(String.valueOf(position));
+		holder.ivTakePhoto.setTag(String.valueOf(position));
+		holder.tvReplyCount.setTag(String.valueOf(position));
+		holder.ivMore.setTag(String.valueOf(position));
+		
+		holder.ivPhoto.setTag(String.valueOf(position));
+		
+		
+		
+		// listview设置背景
+		// HomeActivity.this.changeListViewBackground(feedItem.image.url);
+		// ImageLoader.getInstance().displayImage(feedItem.image.url,
+		// holder.ivListItemBackground, EmoApplication.options_normal);
+
+		// 设置监听事件
+		setOnClickListener(holder);
+
+		// 显示头像
+		ImageLoader.getInstance().displayImage(feedItem.user.head, holder.ivHeader, EmoApplication.options_circle);
+		// 显示名称
+		holder.tvName.setText(feedItem.user.name);
+		// 发布时间
+		holder.tvPublishTime.setText(EmoTimeUtils.formatTime(feedItem.publish_time));
+		// 发表内容
+		holder.tvContent.setText(feedItem.content);
+		// 位置
+		holder.tvPosition.setText(feedItem.location);
+		
+		//赞
+		if(feedItem.is_like){
+			holder.ivLike.setImageResource(R.drawable.heart_red);
+		}else{
+			holder.ivLike.setImageResource(R.drawable.heart_white);
+		}
+		
+		// 点赞次数
+		holder.tvLikeCount.setText(String.valueOf(feedItem.like_count));
+		// 回复次数
+		if (feedItem.repost_count > 0) {
+			holder.tvReplyCount.setText("x" + feedItem.repost_count);
+		}
+
+		//发的图
+		ImageLoader.getInstance().displayImage(feedItem.image.url, holder.ivPhoto, EmoApplication.options_normal);
+		
+		// 回照片
+		if (feedItem.is_repost) {
+			if(!TextUtils.isEmpty(feedItem.repost.repost_image.url)){
+				ImageLoader.getInstance().displayImage(feedItem.repost.repost_image.url, holder.ivReplyPhoto,
+						EmoApplication.options_normal);
+				holder.ivReplyPhoto.setVisibility(View.VISIBLE);
+				holder.ivReplyPhoto.setClickable(true);
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.ivReplyPhoto.getLayoutParams();
+				params.setMargins(0, 0, 10,-10 );
+				holder.ivReplyPhoto.setLayoutParams(params);
+			}else{
+				holder.ivReplyPhoto.setVisibility(View.INVISIBLE);
+				holder.ivReplyPhoto.setClickable(false);
+			}
+		}else{
+			holder.ivReplyPhoto.setVisibility(View.INVISIBLE);
+			holder.ivReplyPhoto.setClickable(false);
+		}
+		return convertView;
+	}
+
+	// 为item里面的每个控件设置监听事件
+	public void setOnClickListener(ViewHolder holder) {
+		// holder.ivHeader.setOnClickListener(this);
+		ListItemOnClickListener listener=new ListItemOnClickListener(holder);
+		holder.llListItemTitle.setOnClickListener(listener);
+		holder.ivPhoto.setOnClickListener(listener);
+		holder.ivReplyPhoto.setOnClickListener(listener);
+		holder.ivLike.setOnClickListener(listener);
+		holder.tvLikeCount.setOnClickListener(listener);
+		holder.ivTakePhoto.setOnClickListener(listener);
+		holder.ivMore.setOnClickListener(listener);
+	}
+	
+	private class ListItemOnClickListener implements View.OnClickListener{
+		ViewHolder holder;
+		public ListItemOnClickListener(ViewHolder holder){
+			this.holder=holder;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			Log.i("doubleEvent","click 事件");
+			long currMillis = System.currentTimeMillis();
+			long interval = 0;
+			if(preMillis == 0){
+				preMillis = currMillis;
+			}else{
+				interval = currMillis - preMillis ;
+				preMillis = currMillis;
+				if(interval > 100 && interval < 1000){//双击事件
+					Log.i("doubleEvent","双击事件...:"+interval);
+					onDoubleEvent(v,holder);
+				}else{
+					Log.i("doubleEvent","单击事件...:"+interval);
+					onClickEvent(v,holder);
+				}
+			}
+		}
+	}
+	
+	//双击事件
+	private void onDoubleEvent(final View view,ViewHolder holder) {
+		if(view.getId() == R.id.iv_list_item_photo){
+			int index = Integer.parseInt((String)view.getTag());
+			if(!feedItemList.get(index).is_like){
+				//显示红心
+				int likeCount = feedItemList.get(index).like_count + 1;
+				String strLikeCount = String.valueOf(likeCount);
+				holder.ivLike.setImageResource(R.drawable.heart_red);
+				holder.tvLikeCount.setText(strLikeCount);
+				requestLike(view,holder,true);//请求赞
+			}
+		}
+	}
+	
+	//单击事件
+	private void onClickEvent(View view,ViewHolder holder) {
+		int index = Integer.parseInt((String)view.getTag());
+		int id = view.getId();
+		Intent intent = new Intent();
+		SharedPreferences sp = context.getSharedPreferences("config", Context.MODE_PRIVATE);
+		String token = sp.getString("X-Kata-Token", null);
+		final FeedDataItem itemData = feedItemList.get(index);
+		switch(id){
+		case R.id.rl_title:// listitem中的头部
+			Log.i("home_click", "listitem中的  头部          index=" + index);
+			//跳转到个人feed
+			intent.setClass(context, PersonalFeedActivity.class);
+			intent.putExtra("uid", itemData.user.id);	//用户id
+			intent.putExtra("fid", itemData.id);		//feed id
+			intent.putExtra("X-Kata-Token", token);		//token
+			context.startActivity(intent);
+			break;
+		case R.id.iv_list_item_photo:
+			Log.i("home_click", "listitem中的  拍的照片          index=" + index);
+			break;
+		case R.id.iv_list_item_reply_photo:
+			Map<String,String> headers = new HashMap<String,String>();
+			headers.put("X-Kata-Token", token);
+			JSONObject json = new JSONObject();
+			try {
+				json.put("fid",itemData.repost.repost_id);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			EmoRequest request = new EmoStringRequest(AppConfig.ServiceUrl.strGetFeed, headers, json.toString(), new IEmoHttpListener() {
+				@Override
+				public void onSuccess(String tag, String requestUrl, String requestResult) {
+					if(TextUtils.equals(requestUrl, AppConfig.ServiceUrl.strGetFeed) && tag == null){
+						Log.i("reply_photo","reply_photo:"+requestResult);
+						JSONObject json = null;
+						try {
+							 json = new JSONObject(requestResult);
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
+						
+						int errno = -1;
+						try {
+							errno = json.getInt("errno");
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
+						if(errno == 0){
+							Intent intent = new Intent();
+							intent.setClass(context, SingleFeedActivity.class);
+							String strJson = "";
+							try {
+								strJson = json.getString("data").toString();
+							} catch (JSONException e) {
+								e.printStackTrace();
+							}
+							intent.putExtra("feed_data_item", strJson);
+							context.startActivity(intent);
+						}
+					}
+				}
+				
+				@Override
+				public void onFailed(String tag, String requestUrl, int errorNo, String requestResult) {
+					
+				}
+			});
+			EmoHttpClient.getInstance().doPost(request);
+			break;
+		case R.id.iv_list_item_like:
+			Log.i("home_click", "listitem中的  赞          index=" + index);
+			int resourceId = 0;
+			int likeCount = Integer.parseInt(holder.tvLikeCount.getText().toString());
+			if(feedItemList.get(index).is_like){
+				resourceId = R.drawable.heart_white;
+				likeCount--;
+			}else{
+				resourceId = R.drawable.heart_red;
+				likeCount++;
+			}
+			feedItemList.get(index).is_like = !feedItemList.get(index).is_like;
+			holder.ivLike.setImageResource(resourceId);
+			holder.tvLikeCount.setText(likeCount + "");
+			requestLike(view, holder,!feedItemList.get(index).is_like);
+			break;
+		case R.id.tv_list_item_likecount:
+			Log.i("home_click", "listitem中的  赞的个数          index=" + index);
+			getLikeList(view,holder);//获取点赞列表
+			break;
+		case R.id.iv_list_item_take_photo:
+			Log.i("home_click", "listitem中的  拍照功能          index=" + index);
+			break;
+		case R.id.iv_list_item_more:
+			Log.i("home_click", "listitem中的  更多          index=" + index);
+			break;
+		}
+	}
+
+	//点赞列表
+	private void getLikeList(View view,ViewHolder holder) {
+		SharedPreferences sp = context.getSharedPreferences("config", Context.MODE_PRIVATE);
+		String token = sp.getString("X-Kata-Token", null);
+		Map<String,String> headers = new HashMap<String, String>();
+		if(!TextUtils.isEmpty(token)){
+			headers.put("X-Kata-Token", token);
+		}
+		int index = Integer.parseInt((String)view.getTag());
+		FeedDataItem item = feedItemList.get(index);
+		JSONObject json = null;
+		if(item != null){
+			String fid = item.id;
+			json = new JSONObject();
+			try {
+				json.put("fid", fid);
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return;
+			}
+		}
+		
+		EmoRequest request = new EmoStringRequest(AppConfig.ServiceUrl.strGetLikerList, headers,json.toString(), new IEmoHttpListener() {
+			@Override
+			public void onSuccess(String tag, String requestUrl, String requestResult) {
+				Intent intent = new Intent();
+				intent.setClass(context, LikeListActivity.class);
+				intent.putExtra("like", requestResult);
+				context.startActivity(intent);
+			}
+			@Override
+			public void onFailed(String tag, String requestUrl, int errorNo, String requestResult) {
+			}
+		});
+		EmoHttpClient.getInstance().doPost(request);
+	}
+
+	private void requestLike(View view,ViewHolder holder,boolean isLike) {
+		SharedPreferences sp = context.getSharedPreferences("config",Context.MODE_PRIVATE);
+		final int index = Integer.parseInt((String)view.getTag());
+		String fid = feedItemList.get(index).id;
+		String token = sp.getString("X-Kata-Token", null);
+		Map<String,String> headers = new HashMap<String, String>();
+		headers.put("X-Kata-Token", token);
+		JSONObject json = new JSONObject();
+		try {
+			json.put("fid", fid);
+			json.put("is_like", isLike+"");//点赞
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		EmoRequest request = new EmoStringRequest(AppConfig.ServiceUrl.strLikeFeed, headers, json.toString(), new IEmoHttpListener() {
+			@Override
+			public void onSuccess(String tag, String requestUrl, String requestResult) {
+				if(TextUtils.equals(AppConfig.ServiceUrl.strLikeFeed, requestUrl)){
+					try {
+						JSONObject json = new JSONObject(requestResult);
+						if(json.getInt("errno") == 0){
+							feedItemList.get(index).is_like = true;
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			@Override
+			public void onFailed(String tag, String requestUrl, int errorNo, String requestResult) {
+			}
+		});
+		EmoHttpClient.getInstance().doPost(request);		
+	}
+}

@@ -1,0 +1,71 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    android:orientation="vertical"
+    android:background="@color/translucent">
+    
+    <!-- 返回，发布 -->
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="50dip">
+        
+        <ImageView 
+            android:id="@+id/iv_publish_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/back_left"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dip"
+            android:clickable="true"/>
+        
+        <TextView 
+            android:id="@+id/tv_publish_publish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="发布"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dip"
+            android:clickable="true"/>
+    </RelativeLayout>
+    
+    <!-- 发布的照片 -->
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="200dip">
+        <ImageView 
+            android:layout_width="300dip"
+            android:layout_height="300dip"
+            android:layout_centerInParent="true"
+            android:background="@drawable/test"/>
+    </RelativeLayout>
+	
+    
+    <EditText 
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:background="@color/white"/>
+    
+    
+    
+    
+        
+</LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

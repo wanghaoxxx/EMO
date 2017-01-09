@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/register_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    android:background="@drawable/background">
+
+    <com.emolabs.im.widget.EmoViewPager
+        android:id="@+id/fragment_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dip"
+        android:orientation="horizontal" 
+        android:background="#00000000">
+        
+        <Button 
+            android:id="@+id/back_left"
+            android:layout_width="9dip"
+            android:layout_height="16dip"
+            android:background="@drawable/back_left"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            />
+        
+        <TextView 
+            android:id="@+id/ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text="确定"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:layout_marginRight="20dip"
+            android:clickable="true"
+            android:focusable="true"
+            />
+        	
+        <LinearLayout 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal"
+            >
+            <ImageView 
+                android:id="@+id/register_dot_0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/dot_nonselected"
+                />
+            <ImageView 
+                android:id="@+id/register_dot_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/dot_nonselected"
+                android:layout_marginLeft="15dip"/>
+            <ImageView 
+                android:id="@+id/register_dot_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/dot_nonselected"
+                android:layout_marginLeft="15dip"/>
+            <ImageView 
+                android:id="@+id/register_dot_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/dot_nonselected"
+                android:layout_marginLeft="15dip"/>
+        </LinearLayout>
+       
+        
+        
+    </RelativeLayout>
+
+</RelativeLayout>

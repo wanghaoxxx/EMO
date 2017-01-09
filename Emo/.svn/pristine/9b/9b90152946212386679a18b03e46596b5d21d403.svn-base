@@ -1,0 +1,77 @@
+package com.emolabs.im.config;
+
+import java.io.File;
+
+import android.app.Application;
+import android.os.Environment;
+import android.util.Log;
+
+import com.emolabs.im.R;
+import com.emolabs.im.circledrawable.CircleBitmapDisplayer;
+import com.emolabs.im.utils.EmoTimeUtils;
+import com.emolibs.im.volley.EmoVolley;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+
+public class EmoApplication extends Application {
+	private static final String TAG = "EmoApplication";
+	static Application instance;
+	public static ImageLoaderConfiguration config;
+	public static DisplayImageOptions options_circle; // 圆形
+	public static DisplayImageOptions options_round; // 圆角方形
+	public static DisplayImageOptions options_normal;
+	
+	public static String appDataDir;
+	public static String appImageDir;
+	public static String userToken;
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		initApplication();
+		initImageLoaderParam();
+		initFileAndDir();
+		EmoVolley.init(this);
+		instance = this;
+	}
+
+	private void initFileAndDir() {
+		String sdCard = Environment.getExternalStorageDirectory().getAbsolutePath();
+		String pkgName = getPackageName();
+		appDataDir = sdCard + "/" + pkgName;
+		appImageDir = appDataDir + "/" + "image";
+		
+		File file = new File(appImageDir);
+		if(!file.exists() && !file.isDirectory()){
+			file.mkdirs();
+		}
+	}
+
+	private void initImageLoaderParam() {
+		config = new ImageLoaderConfiguration.Builder(getApplicationContext()).threadPriority(Thread.NORM_PRIORITY - 2)
+				.denyCacheImageMultipleSizesInMemory().tasksProcessingOrder(QueueProcessingType.LIFO).build();
+		ImageLoader.getInstance().init(config);
+		// 图片圆形显示，值为整数
+		options_circle = new DisplayImageOptions.Builder().displayer(new CircleBitmapDisplayer(1))
+				.showImageOnFail(R.color.gray).showImageOnLoading(R.color.gray).cacheInMemory(true).cacheOnDisk(true)
+				.build();
+		options_round = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(1)) // 图片圆角显示，值为整数
+				.build();
+		options_normal = new DisplayImageOptions.Builder().showImageForEmptyUri(R.color.gray)
+				.showImageOnLoading(R.color.gray).cacheInMemory(true).cacheOnDisk(true).build();
+	}
+
+	private void initApplication() {
+		//测试用
+		String filename = EmoTimeUtils.getFileNameByTime();
+		Log.i(TAG,"filename="+filename);
+	}
+
+	public static Application getInstance() {
+		return instance;
+	}
+
+}

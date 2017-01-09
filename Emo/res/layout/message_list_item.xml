@@ -1,0 +1,73 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="100dip" >
+    <ImageView 
+        android:id="@+id/iv_msg_listitem_header"
+        android:layout_width="70dip"
+        android:layout_height="70dip"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="5dip"
+        android:clickable="true"/>
+    
+    <TextView 
+        android:id="@+id/tv_msg_listitem_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="张红军"
+        android:textColor="@color/blue"
+        android:textSize="16sp"
+        android:layout_toRightOf="@id/iv_msg_listitem_header"
+        android:layout_alignTop="@id/iv_msg_listitem_header"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="10dip"
+        android:clickable="true"/>
+    
+    <TextView 
+        android:id="@+id/tv_msg_listitem_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="7分钟前"
+        android:layout_toRightOf="@id/iv_msg_listitem_header"
+        android:layout_alignBottom="@id/iv_msg_listitem_header"
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="10dip"
+        android:clickable="true"/>
+
+    <TextView 
+        android:id="@+id/tv_msg_listitem_dothings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="关注了你"
+        android:textSize="18sp"
+        android:layout_toRightOf="@id/tv_msg_listitem_name"
+        android:layout_alignTop="@id/iv_msg_listitem_header"
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="10dip"
+        android:clickable="true"/>    
+        
+    <ImageView 
+        android:id="@+id/iv_msg_listitem_photo"
+        android:layout_width="100dip"
+        android:layout_height="75dip"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:clickable="true"/>
+    
+</RelativeLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

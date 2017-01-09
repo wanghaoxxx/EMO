@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <!-- 重拍，下一步 -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:background="@color/dark" >
+
+        <TextView
+            android:id="@+id/tv_showphoto_rephotograph"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dip"
+            android:drawableLeft="@drawable/back_left"
+            android:drawablePadding="5dip"
+            android:text="重拍"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:clickable="true" />
+
+        <TextView
+            android:id="@+id/tv_showphoto_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dip"
+            android:text="下一步"
+            android:textColor="@color/white"
+            android:textSize="20sp" 
+            android:clickable="true"/>
+    </RelativeLayout>
+
+    <!-- 拍的照片 -->
+
+    <ImageView
+        android:id="@+id/iv_showphoto_photo"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1" 
+        android:scaleType="fitXY"/>
+
+    <!-- 调节亮度 -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="92dip"
+        android:layout_gravity="bottom"
+        android:background="@color/dark">
+        <SeekBar
+            android:id="@+id/sb_showphoto_change"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+			android:layout_centerVertical="true"
+			android:layout_toRightOf="@+id/left"     
+			android:layout_toLeftOf="@+id/right"
+			android:layout_marginLeft="10dp"
+			android:layout_marginRight="10dp"/>
+        <ImageView
+            android:id="@id/left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/test" 
+            android:layout_marginLeft="10dip"/>
+        <ImageView
+            android:id="@id/right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/test" 
+            android:layout_marginRight="10dip"/>
+    </RelativeLayout>
+
+</LinearLayout>

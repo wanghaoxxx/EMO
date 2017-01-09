@@ -1,0 +1,268 @@
+package com.emolabs.im.activity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.Request.Method;
+import com.emolabs.im.R;
+import com.emolabs.im.adapter.ListFeedAdapter;
+import com.emolabs.im.config.AppConfig;
+import com.emolabs.im.config.EmoApplication;
+import com.emolabs.im.listener.HomeOnClickListener;
+import com.emolabs.im.listener.RequestFeedListListener;
+import com.emolabs.im.net.EmoHttpClient;
+import com.emolabs.im.net.EmoStringRequest;
+import com.emolabs.im.struct.Feed;
+import com.emolabs.im.struct.FeedDataItem;
+import com.emolabs.im.userinfo.UserInfoManager;
+import com.emolibs.im.volley.GsonRequest;
+import com.emolibs.im.volley.MyVolley;
+import com.emolibs.im.volley.ParamsList;
+import com.emolibs.im.volley.ParamsList.Params;
+import com.manuelpeinado.quickreturnheader.QuickReturnHeaderHelper;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+public class HomeActivity extends Activity {
+	private static final String TAG = "HomeActivity";
+	SharedPreferences sp;
+	ImageView ivListBackground;
+	ListView lvListFeed;
+	Feed feed;
+	ArrayList<FeedDataItem> feedItemList;
+	String last_fid;
+	boolean hasMore;
+	int last_item;//listview最后一条数据
+	boolean isLoadFinished;
+	
+	// 头部浮层
+	RelativeLayout rlFloatLayout;
+	ImageView ivFloatHeader;
+	ImageView ivFloatEmo;
+	ImageView ivFloatNewNotify;
+	ImageView ivFloatAddFriend;
+
+	// 底部浮层
+	ImageView ivBottomHome;
+	ImageView ivBottomTakephoto;
+	ImageView ivBottomDiscover;
+	
+	ListFeedAdapter listFeedAdapter;
+	HomeOnClickListener clickListener;
+	
+	private Handler handler = new Handler(){
+		public void handleMessage(Message msg) {
+			if(msg.what == AppConfig.What.SUCCESS_GET_FEED_LIST){
+				initView((Feed)msg.obj);
+			}else if(msg.what == AppConfig.What.FAILED_GET_FEED_LIST){
+			
+			}else if(msg.what == AppConfig.What.FAILED_NETWORK_GET_FEED_LIST){
+				
+			}else if(msg.what == AppConfig.What.SUCCESS_GET_FEED_LIST_MORE){
+				handleFeedListMore((Feed)msg.obj);
+			}else if(msg.what == AppConfig.What.FAILED_GET_FEED_LIST_MORE){
+				handleFeedListMoreError((Feed)msg.obj);
+			}else if(msg.what == AppConfig.What.FAILED_NETWORK_ERROR_GET_FEED_LIST_MORE){
+				
+			}
+		}
+	};
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_home);
+		clickListener = new HomeOnClickListener(this);
+		isLoadFinished = true ;
+		
+		// 头部浮层
+		rlFloatLayout = (RelativeLayout) findViewById(R.id.rl_home_float_title);
+		ivFloatHeader = (ImageView) findViewById(R.id.iv_home_float_title_header);
+		ivFloatEmo = (ImageView) findViewById(R.id.iv_home_float_emo);
+		ivFloatNewNotify = (ImageView) findViewById(R.id.iv_home_new_notify_msg);
+		ivFloatAddFriend = (ImageView) findViewById(R.id.iv_home_float_add_friend);
+		// 底部浮层
+		ivBottomHome = (ImageView) findViewById(R.id.iv_home_bottom_home);
+		ivBottomTakephoto = (ImageView) findViewById(R.id.iv_home_bottom_takephoto);
+		ivBottomDiscover = (ImageView) findViewById(R.id.iv_home_bottom_discover);
+		// 设置头部浮层监听
+		ivFloatHeader.setOnClickListener(clickListener);
+		ivFloatEmo.setOnClickListener(clickListener);
+		ivFloatNewNotify.setOnClickListener(clickListener);
+		ivFloatAddFriend.setOnClickListener(clickListener);
+		// 设置底部浮层监听
+		ivBottomHome.setOnClickListener(clickListener);
+		ivBottomTakephoto.setOnClickListener(clickListener);
+		ivBottomDiscover.setOnClickListener(clickListener);
+
+		ivListBackground = (ImageView) findViewById(R.id.iv_home_background);
+		lvListFeed = (ListView) findViewById(R.id.lv_home_list_feed);
+		
+//		getFeedList();
+		getFeedList2();
+	}
+
+	protected void handleFeedListMore(Feed feed) {
+		hasMore = feed.data.has_more; 
+		last_fid = feed.data.last_fid;
+		last_item = feed.data.feed_list.size();
+		listFeedAdapter.feedItemList.addAll(feed.data.feed_list);
+		listFeedAdapter.notifyDataSetChanged();
+		isLoadFinished  = true;
+	}
+	
+	private void handleFeedListMoreError(Feed feed) {
+		hasMore = false;
+		last_fid = null;
+		isLoadFinished  = true;
+	};
+
+	private void getFeedList() {
+		sp = getSharedPreferences("config", Context.MODE_PRIVATE);
+		Map<String, String> headers = new HashMap<String, String>();
+		String uid = sp.getString("uid", null);
+		String token = sp.getString("X-Kata-Token", null);
+		headers.put("X-Kata-Token", token);
+		JSONObject json = new JSONObject();
+		try {
+			json.put("uid", uid);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		String body = json.toString();
+		RequestFeedListListener listener = new RequestFeedListListener(this, handler);
+		EmoStringRequest request = new EmoStringRequest(AppConfig.ServiceUrl.strGetFeedList, headers, body, listener);
+		EmoHttpClient.getInstance().doPost(request);
+	}
+	
+	private void getFeedList2(){
+	    sp = getSharedPreferences("config", Context.MODE_PRIVATE);
+	    String uid = sp.getString("uid", null);
+	    ParamsList params=new ParamsList();
+	    params.add(new Params("uid",uid));
+	    final Response.Listener<Feed> listener=new Response.Listener<Feed>() {
+            @Override
+            public void onResponse(Feed response) {
+                initView(response);
+            }
+        };
+        final Response.ErrorListener errorListener=new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                
+            }
+        };
+        GsonRequest<Feed> request=new GsonRequest<Feed>(Method.POST,AppConfig.ServiceUrl.strGetFeedList,params,Feed.class, listener, errorListener);
+        request.setTag(this);
+	    MyVolley.getRequestQueue().add(request);
+	}
+
+	// 更改listview背景
+	public void changeListViewBackground(String backgroundUrl) {
+		ImageLoader.getInstance().displayImage(backgroundUrl, ivListBackground, EmoApplication.options_normal);
+	}
+
+	// adapter
+	private void initView(Feed feed) {
+		this.feed = feed;
+		this.feedItemList = feed.data.feed_list;
+		this.last_fid = feed.data.last_fid;
+		
+		String headerUrl = UserInfoManager.getInstance().getUserBasicInfo().head;
+		ImageLoader.getInstance().displayImage(headerUrl, ivFloatHeader, EmoApplication.options_circle);
+		listFeedAdapter = new ListFeedAdapter(this, feedItemList,last_fid);
+
+		int titleHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 54f, getResources()
+				.getDisplayMetrics());
+		new QuickReturnHeaderHelper(rlFloatLayout, lvListFeed, titleHeight).setup();
+		
+		this.hasMore = feed.data.has_more;
+		this.last_item = feed.data.feed_list.size();
+		this.lvListFeed.setAdapter(listFeedAdapter);
+//		this.lvListFeed.setOnItemClickListener(new OnItemClickListener() {
+//			@Override
+//			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//				String str = "ListItem parent=" + parent.getClass() + "  view.getId()=" + view.getId() + "  position="
+//						+ position + "  id=" + id;
+//				Log.i(TAG, str);
+//			}
+//		});
+		
+		//设置listview滑动监听器
+		lvListFeed.setOnScrollListener(new OnScrollListener() {
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				
+			}
+			
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+				int lastItem = firstVisibleItem + visibleItemCount - 1 ;
+				String str = "lastItem=" + lastItem + " firstVisibleItem="+firstVisibleItem + " visibleItemCount="+visibleItemCount + " totalItemCount" + totalItemCount ;
+				Log.i(TAG,str);
+				if(hasMore &&  isLoadFinished && lvListFeed.getChildCount() == lastItem){
+					isLoadFinished = false;
+					Map<String,String> headers = new HashMap<String, String>();
+					String uid = sp.getString("uid", null);
+					String token = sp.getString("X-Kata-Token", null);
+					headers.put("X-Kata-Token", token);
+					headers.put("last_fid", last_fid);
+					JSONObject json = new JSONObject();
+					try {
+						json.put("uid", uid);
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					String body = json.toString();
+					RequestFeedListListener listener = new RequestFeedListListener(HomeActivity.this, handler);
+					EmoStringRequest request = new EmoStringRequest(AppConfig.ServiceUrl.strGetFeedList, headers, body, listener);
+					request.setTag("request_more");
+					EmoHttpClient.getInstance().doPost(request);
+				}
+			}
+		});
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == HomeOnClickListener.TAKE_PHOTO){
+			String storage = Environment.getExternalStorageDirectory().getAbsolutePath();
+			Log.i(TAG,"stroage:"+storage);
+			Intent intent = new Intent();
+			intent.putExtra("filename", EmoApplication.appDataDir + "temp.jpg");
+			intent.setClass(this, ShowTakePhotoActivity.class);
+			startActivity(intent);
+		}
+	}
+}
+
+
+
+
+
+

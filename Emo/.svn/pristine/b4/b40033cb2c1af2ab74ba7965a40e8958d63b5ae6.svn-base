@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background">
+
+    <ImageView
+        android:id="@+id/iv_home_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        android:scaleType="centerCrop" />
+
+    <ListView
+        android:id="@+id/lv_home_list_feed"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:cacheColorHint="@color/transparent"
+        android:listSelector="@color/transparent"
+        android:divider="@color/transparent"
+        android:dividerHeight="0dip" />
+    
+        <!-- 顶部浮动层  头像，Logo，好友 -->
+    <RelativeLayout
+        android:id="@+id/rl_home_float_title"
+        android:layout_width="match_parent"
+        android:layout_height="54dip"
+        android:background="@color/translucent"
+        android:layout_alignParentTop="true"
+        android:clickable="true">
+        <ImageView
+            android:id="@+id/iv_home_float_title_header"
+            android:layout_width="34dip"
+            android:layout_height="34dip"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"/>
+        <ImageView
+            android:id="@+id/iv_home_float_emo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/small_emo"
+            android:clickable="true" />
+        
+        <ImageView 
+            android:id="@+id/iv_home_new_notify_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/iv_home_float_emo"
+            android:layout_alignTop="@id/iv_home_float_emo"
+            android:background="@drawable/new_notify_msg"
+            android:clickable="true"
+            />
+
+        <ImageView
+            android:id="@+id/iv_home_float_add_friend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dip"
+            android:background="@drawable/iv_float_add_friend" 
+            android:clickable="true"/>
+    </RelativeLayout>
+
+    <!-- 底部   首页，拍照，发现 -->
+    <RelativeLayout
+        android:id="@+id/rl_home_bottom_title"
+        android:layout_width="match_parent"
+        android:layout_height="90dip"
+        android:background="@color/transparent"
+        android:layout_alignParentBottom="true">
+
+        <ImageView
+            android:id="@+id/iv_home_bottom_takephoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerInParent="true"
+            android:background="@drawable/bottom_take_photo" 
+            android:clickable="true"/>
+        
+        <ImageView 
+            android:id="@+id/iv_home_bottom_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bottom_home"
+            android:layout_marginLeft="20dip"
+            android:clickable="true"/>
+        
+        <ImageView 
+            android:id="@+id/iv_home_bottom_discover"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bottom_discover"
+            android:layout_marginRight="20dip"
+            android:clickable="true"/>
+ 
+    </RelativeLayout>
+
+</RelativeLayout>

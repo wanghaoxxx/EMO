@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+	<ImageView 
+	    android:id="@+id/iv_frag3_user_header"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center_horizontal"
+	    android:src="@drawable/user_header"
+	    android:layout_marginTop="50dip"/>   
+	<TextView 
+	    android:id="@+id/tv_frag3_username"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center_horizontal"
+	    android:text="jiulu"
+	    android:textColor="#ffffff"
+	    android:layout_marginTop="20dip"/>
+	
+	<EditText
+	    android:id="@+id/et_frag3_phone_number"
+	    android:layout_width="match_parent"
+	    android:layout_height="50dip"
+	    android:hint="输入手机号"
+	    android:background="#7A6F69"
+	    android:textColorHint="#ffffff"
+	    android:layout_marginTop="30dip"
+	    android:textColor="#ffffff"/>
+	<View 
+	    android:layout_width="match_parent"
+	    android:layout_height="0.2dip"
+	    android:background="#ffffff"/>
+	
+	<EditText 
+	    android:id="@+id/et_frag3_password"
+	    android:layout_width="match_parent"
+	    android:layout_height="50dip"
+	    android:hint="输入密码"
+	    android:textColorHint="#ffffff"
+	    android:background="#7A6F69"
+	    android:textColor="#ffffff"
+	    android:inputType="textPassword"/>
+	
+	
+	
+</LinearLayout>

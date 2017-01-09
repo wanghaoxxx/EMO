@@ -1,0 +1,7 @@
+package com.emolabs.im.struct;
+
+public class Feed {
+	public int errno ;
+	public FeedData data;
+	public String usermsg;
+}

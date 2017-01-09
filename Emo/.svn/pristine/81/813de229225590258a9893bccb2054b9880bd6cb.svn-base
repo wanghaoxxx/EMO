@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+	<ImageView 
+	    android:id="@+id/iv_frag4_user_header"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center_horizontal"
+	    android:src="@drawable/user_header"
+	    android:layout_marginTop="50dip"/>   
+	<TextView 
+	    android:id="@+id/tv_frag4_username"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center_horizontal"
+	    android:text="jiulu"
+	    android:textColor="#ffffff"
+	    android:layout_marginTop="20dip"/>
+	
+	<EditText
+	    android:id="@+id/et_frag4_identifying_code"
+	    android:layout_width="match_parent"
+	    android:layout_height="50dip"
+	    android:hint="输入验证码"
+	    android:background="#7A6F69"
+	    android:textColorHint="#ffffff"
+	    android:layout_marginTop="30dip"
+	    android:textColor="#ffffff"/>
+
+	<Button 
+	    android:id="@+id/btn_frag4_complete"
+	    android:layout_width="300dip"
+	    android:layout_height="50dip"
+	    android:text="完成"
+	    android:layout_marginTop="10dip"
+	    android:layout_gravity="center_horizontal"/>
+	
+</LinearLayout>
